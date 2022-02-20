@@ -47,8 +47,8 @@ const ContactForm = () => {
   };
 
   return (
-    <div>
-      <Header>Enter name and phone number: </Header>
+    <div> 
+      <Header> Phonebook </Header>
       <Form onSubmit={handleSubmit}>
         <label>
           Name
