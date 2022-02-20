@@ -1,38 +1,54 @@
-import { useState } from 'react';
+import React, { useState, memo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { Header, Form, Input, Button } from './ContactForm.styled';
+import { addItem } from '../Redux/Contacts/contacts-actions';
 
-const ContactForm = ({ onAddContact }) => {
+const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
+  const contacts = useSelector(state => state.contacts.items);
+  const dispatch = useDispatch();
+
   const handleSubmit = e => {
     e.preventDefault();
+    const normalizeName = textNormalize(name);
 
-    onAddContact(name, number);
-    setName(' ');
-    setNumber(' ');
+    const isInContacts = contacts.some(
+      item => item.name.toLowerCase() === normalizeName,
+    );
+
+    if (isInContacts) {
+      alert(`${name} is already in your contacts`);
+      return;
+    }
+
+    dispatch(addItem({ name, number }));
+
+    setName('');
+    setNumber('');
+  };
+
+  const textNormalize = text => {
+    return text.toLowerCase();
   };
 
   const handleChange = e => {
-    const { name, value } = e.target;
-    switch (name) {
-      case 'name':
-        setName(value);
-        break;
-
-      case 'number':
-        setNumber(value);
-        break;
-
-      default:
-        return;
+    const inputName = e.target.name;
+    const value = e.target.value;
+    if (inputName === 'name') {
+      setName(value);
+    }
+    if (inputName === 'number') {
+      setNumber(value);
     }
   };
 
   return (
     <div>
-      <Header>Phonebook</Header>
+      <Header>Enter name and phone number: </Header>
       <Form onSubmit={handleSubmit}>
         <label>
           Name
@@ -69,4 +85,4 @@ ContactForm.propTypes = {
   number: PropTypes.string,
   AddContact: PropTypes.func,
 };
-export default ContactForm;
+export default memo(ContactForm);
